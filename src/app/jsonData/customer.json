@@ -1,0 +1,139 @@
+[
+    {
+        "acc_code": 46184,
+        "acc_name": "A C DHANASHETTI",
+        "address": {
+            "office": "A\/P TAMBA, MAIN ROAD,\nTAMBA,",
+            "place": {
+                "city": "TAMBA",
+                "district": {
+                    "name": "VIJAYAPURA",
+                    "state": "KARNATAKA"
+                }
+            }
+        }
+    },
+    {
+        "acc_code": 59,
+        "acc_name": "A C Gejji ATHANI",
+        "address": {
+            "office": "Siddeshwar Road,",
+            "place": {
+                "city": "ATHANI",
+                "district": {
+                    "name": "BELAGAVI",
+                    "state": "KARNATAKA"
+                }
+            }
+        }
+    },
+    {
+        "acc_code": 18777,
+        "acc_name": "A D Patil Anna Matru Shet Vivi",
+        "address": {
+            "place": {
+                "city": "KODOLI",
+                "district": {
+                    "name": "KOLHAPUR",
+                    "state": "MAHARASHTRA"
+                }
+            }
+        }
+    },
+    {
+        "acc_code": 43352,
+        "acc_name": "A G GUNDA",
+        "address": {
+            "office": "CTS NO 1772\/83, 1772\/84, --, --, MUDHOL ROAD,\nMAHALINGAPUR,\nKarnataka-587312",
+            "place": {
+                "city": "MAHALINGPUR",
+                "district": {
+                    "name": "BAGALKOT",
+                    "state": "KARNATAKA"
+                }
+            }
+        }
+    },
+    {
+        "acc_code": 1203,
+        "acc_name": "A J DHANASHETTI AND COMPANY INDI",
+        "address": {
+            "office": "Doshi Complex Bijapur Roads No 3 Opp Bus Stand",
+            "place": {
+                "city": "INDI",
+                "district": {
+                    "name": "VIJAYAPURA",
+                    "state": "KARNATAKA"
+                }
+            }
+        }
+    },
+    {
+        "acc_code": 1422,
+        "acc_name": "A ONE AGRI TECH",
+        "address": {
+            "office": "SHOP NO 2-10-30\/6, OPP.MOTHER TANK,\nWARD NO 7,\nKALABURAGI ROAD, LINGASGURU,\nKarnataka-584122",
+            "place": {
+                "city": "LINGASUGUR",
+                "district": {
+                    "name": "RAICHUR",
+                    "state": "KARNATAKA"
+                }
+            }
+        }
+    },
+    {
+        "acc_code": 44735,
+        "acc_name": "A ONE FERTILIZERS",
+        "address": {
+            "office": "SHOP NO 2-171, MAIN ROAD,\nNEAR BUS STAND MALANOOR,",
+            "place": {
+                "city": "MALANOOR",
+                "district": {
+                    "name": "YADGIR",
+                    "state": "KARNATAKA"
+                }
+            }
+        }
+    },
+    {
+        "acc_code": 545,
+        "acc_name": "A P Roudkundi And Company",
+        "address": {
+            "office": "2 3 31 Raichur Road",
+            "place": {
+                "city": "KARATAGI",
+                "district": {
+                    "name": "KOPPAL",
+                    "state": "KARNATAKA"
+                }
+            }
+        }
+    },
+    {
+        "acc_code": 11,
+        "acc_name": "A S Ganiger And Brothers",
+        "address": {
+            "place": {
+                "city": "AINAPUR",
+                "district": {
+                    "name": "BELAGAVI",
+                    "state": "KARNATAKA"
+                }
+            }
+        }
+    },
+    {
+        "acc_code": 31,
+        "acc_name": "A S Nashi Traders",
+        "address": {
+            "place": {
+                "city": "ALMEL",
+                "district": {
+                    "name": "VIJAYAPURA",
+                    "state": "KARNATAKA"
+                }
+            }
+        }
+    }
+]

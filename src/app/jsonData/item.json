@@ -1,0 +1,36 @@
+[
+    {
+        "I_id": 1,
+        "I_name": "00:00:50 (YARA-KRISTA SOP) 25 Kgs ",
+        "I_QtyUnit": "BAG",
+        "I_PackUnit": "KGS",
+        "I_Packing": 25.000,
+        "I_StockUnit": "MTS",
+        "I_Factor": 1000.000
+    },
+    {
+        "I_id": 2,
+        "I_name": "12:61:00 (YARA-KRISTA MAP) 25 Kgs ",
+        "I_QtyUnit": "BAG",
+        "I_PackUnit": "KGS",
+        "I_Packing": 25.000,
+        "I_StockUnit": "MTS",
+        "I_Factor": 1000.000
+    },
+    {
+        "I_id": 3,
+        "I_name": "WHEEL SPANNESRS ",
+        "I_QtyUnit": "NOS",
+        "I_PackUnit": "NOS",
+        "I_StockUnit": "NOS"
+    },
+    {
+        "I_id": 4,
+        "I_name": "Demo (ADITYA-ADITYA)",
+        "I_QtyUnit": "BOX",
+        "I_PackUnit": "NOS",
+        "I_Packing": 1,
+        "I_StockUnit": "SACH",
+        "I_Factor": 100
+    }
+]
