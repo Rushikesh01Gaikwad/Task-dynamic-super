@@ -1,6 +1,5 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import customerData from '../../jsonData/customer.json';
 import {Observable, of} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import { Icustomer } from '../../interfaces/icustomer';
@@ -9,6 +8,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ResultServiceService } from '../../services/result-service.service';
 import ItemJson from '../../jsonData/item.json';
 import { IItem } from '../../interfaces/i-item';
+import customerData from '../../jsonData/customer.json';
 
 @Component({
   selector: 'app-home',
@@ -17,44 +17,18 @@ import { IItem } from '../../interfaces/i-item';
 })
 export class HomeComponent implements OnInit {
 
-  finalAmount: number = 0;
-  id = 0;
   displayedColumns: string[] = ['I_id', 'I_name', 'I_QtyUnit', 'Item_Qty','Item_Rate','Item_Value','Action'];
   dataSource = new MatTableDataSource<IRitem>();
 
-  entityIResult: Iresult = <Iresult>{
-    order_no: '',
-    Order_date: '',
-    cust_id: 0,
-    Amount: 0,
-    Items:[
-    {
-      Item_Id: 0,
-      Item_Unit: '',
-      Item_Qty: 0,
-      Item_Rate: 0,
-      Item_Value: 0,
-    }
-    ]
-  };
-  entityItem:IItem = <IItem>{
-    I_id: 0,
-    I_name: '',
-    I_QtyUnit:'',
-  };
+  selectedItemId!:number;
+  entityIResult: Iresult = <Iresult>{};
+  entityIRItem: IRitem = <IRitem>{};
+  entityItem: IItem = <IItem>{};
+  entityICustomer: Icustomer = <Icustomer>{}
 
   reference:any;
-
-  selectedItemId!:number;
-  editItemName: string = '';
-  editItemUnit: string = '';
-  editItemQty: number = 0;
-  editItemRate: number = 0;
-
-  order_no: string = '';
-  Order_date: string = '';
-  cust_id: number = 0;
-  Amount: number = 0;
+  jsonItems = <IItem[]>ItemJson
+  selectedItemUnit: string | undefined;
 
   selectedItemQty: number = 0;
   selectedItemRate: number = 0;
@@ -62,6 +36,7 @@ export class HomeComponent implements OnInit {
   customerControl = new FormControl<string | Icustomer>('');
   filteredOptions!: Observable<Icustomer[]>;
   itemsjson!: Observable<IItem[]>;
+
   customers: Icustomer[] = customerData;
   selectedCustomerDetails: any = null;
 
@@ -103,17 +78,21 @@ export class HomeComponent implements OnInit {
   }
 
   onItemSelected(item: IItem): void {
+
     this.selectedItemDetails = item;
     this.itemControl.setValue(item);
     console.log('Selected Item:', item);
   }
-  
 
+  setItemName():void
+  {
+
+  }
 
   validateInput(event: Event) {
     const input = event.target as HTMLInputElement;
     input.value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    this.order_no = input.value
+    this.entityIResult.order_no = input.value
   }
 
   updateItemValue(element: IRitem): void {
@@ -126,22 +105,28 @@ export class HomeComponent implements OnInit {
   }
 
   private updateFinalAmount(): void {
-    this.finalAmount = this.items.reduce((sum, current) => sum + current.Item_Value, 0);
-    this.finalAmount = parseFloat(this.finalAmount.toFixed(2));
-    this.Amount = this.finalAmount;
+    this.entityIResult.Amount = this.items.reduce((sum, current) => sum + current.Item_Value, 0);
+    this.entityIResult.Amount = parseFloat(this.entityIResult.Amount.toFixed(2));
   }
 
   onOptionSelected(event: any): void {
     this.selectedCustomerDetails = event.option.value;
-    this.cust_id = this.selectedCustomerDetails.acc_code;
+    this.entityIResult.cust_id = this.selectedCustomerDetails.acc_code;
     console.log('Selected Customer Details:', this.selectedCustomerDetails);
   }
+  
 
-  formatDate(event: any) {
-    const date = new Date(event.target.value);
-    const formattedDate = this.formatToDDMMYYYY(date);
-    this.Order_date = formattedDate;
-    console.log('Selected Date: ', formattedDate);
+  formatDate(event: any): void {
+    const inputDate = event.target.value; // This will be in yyyy-MM-dd format
+    this.entityIResult.Order_date = this.formatToDDMMYYYY(new Date(inputDate));
+    console.log('Selected Date: ', this.entityIResult.Order_date);
+  }
+
+  formatToYYYYMMDD(dateString: string): string {
+    if (!dateString) return '';
+    const [day, month, year] = dateString.split('/').map(Number);
+    const formattedDate = new Date(year, month, day);
+    return formattedDate.toISOString().split('T')[0]; // yyyy-MM-dd
   }
 
   private formatToDDMMYYYY(date: Date): string {
@@ -178,13 +163,15 @@ export class HomeComponent implements OnInit {
 
 
   submitData(): void {
+
+    const itemsWithoutItemName = this.items.map(({ Item_name,Sr_No, ...item }) => item);
   
     const result: Iresult = {
-      order_no: this.order_no,
-      Order_date: this.Order_date,
-      cust_id: this.cust_id,
-      Amount: this.Amount,
-      Items: this.items
+      order_no: this.entityIResult.order_no,
+      Order_date: this.entityIResult.Order_date,
+      cust_id: this.entityIResult.cust_id,
+      Amount: this.entityIResult.Amount,
+      Items: itemsWithoutItemName
     };
   
     // Convert the result to JSON format
@@ -211,20 +198,20 @@ export class HomeComponent implements OnInit {
     const item = this.items.find(i => i.Item_Id === itemId);
   
   if (item) {
-    this.editItemName = item.Item_name;
-    this.editItemUnit = item.Item_Unit;
-    this.editItemQty = item.Item_Qty;
-    this.editItemRate = item.Item_Rate;
+    this.entityIRItem.Item_name = item.Item_name || '';
+    this.entityIRItem.Item_Unit = item.Item_Unit;
+    this.entityIRItem.Item_Qty = item.Item_Qty;
+    this.entityIRItem.Item_Rate = item.Item_Rate;
   }
   }
   updateItem() {
     const index = this.items.findIndex(i => i.Item_Id === this.selectedItemId);
 
     if (index !== -1) {
-      this.items[index].Item_Unit = this.editItemUnit;
-      this.items[index].Item_Qty = this.editItemQty
-      this.items[index].Item_Rate = this.editItemRate;
-      this.items[index].Item_Value = this.editItemQty * this.editItemRate;
+      this.items[index].Item_Unit = this.entityIRItem.Item_Unit;
+      this.items[index].Item_Qty = this.entityIRItem.Item_Qty
+      this.items[index].Item_Rate = this.entityIRItem.Item_Rate;
+      this.items[index].Item_Value = this.entityIRItem.Item_Qty * this.entityIRItem.Item_Rate;
       
       this.updateFinalAmount();
       this.updateTableData();

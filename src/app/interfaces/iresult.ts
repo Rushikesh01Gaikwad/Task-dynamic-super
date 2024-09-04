@@ -8,8 +8,8 @@ export interface Iresult {
 }
 
 export interface IRitem {
-    Sr_No: number | undefined;
-    Item_name: string;
+    Sr_No?: number;
+    Item_name?: string;
     Item_Id: number;
     Item_Unit: string;
     Item_Qty: number;

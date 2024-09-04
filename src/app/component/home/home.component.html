@@ -12,7 +12,7 @@
       <div class="mb-3">
         <label for="orderDate" class="form-label">Date</label>
         <input type="date" name="orderDate" class="form-control" min="2024-04-01" max="2025-03-31" 
-        [(ngModel)]="entityIResult.Order_date"
+        [value]="formatToYYYYMMDD(entityIResult.Order_date)"
         (change)="formatDate($event)">
       </div>
       <div class="mb-3">
@@ -40,6 +40,7 @@
         </div>
       </div>
     </form>
+
     <div>
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
         <!-- Columns for the table -->
@@ -61,7 +62,6 @@
         <ng-container matColumnDef="Item_Qty">
           <th mat-header-cell *matHeaderCellDef> Quantity </th>
           <td mat-cell *matCellDef="let element">
-            <!-- <input matInput type="number" [(ngModel)]="element.Item_Qty" (ngModelChange)="updateItemValue(element)" /> -->
             {{element.Item_Qty}}
           </td>
         </ng-container>
@@ -69,7 +69,6 @@
         <ng-container matColumnDef="Item_Rate">
           <th mat-header-cell *matHeaderCellDef> Rate </th>
           <td mat-cell *matCellDef="let element">
-            <!-- <input matInput type="number" [(ngModel)]="element.Item_Rate" (ngModelChange)="updateItemValue(element)" /> -->
             {{element.Item_Rate}}
           </td>
         </ng-container>
@@ -97,11 +96,30 @@
 
       <div class="d-flex justify-content-between mt-3">
         <p>Total Amount is </p>
-        <p>{{finalAmount | number:'1.2-2'}}</p>
+        <p>{{this.entityIResult.Amount| number:'1.2-2'}}</p>
       </div>
 
       <div class="mt-3 d-flex justify-content-end">
         <button type="button" class="btn btn-outline-success" (click)="submitData()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Edit Modal Item -->
+  <div class="modal fade" id="AddEditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          ...
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
       </div>
     </div>
   </div>
@@ -132,6 +150,18 @@
             <strong>Selected Name: {{selectedItemDetails?.I_name}}</strong><br />
             <strong>Unit is: {{selectedItemDetails?.I_QtyUnit}}</strong>
           </div>
+          <div class="mb-3">
+            <label for="Quantity" class="form-label">Select Item</label>
+            <div class="d-flex">
+              <select class="form-select" aria-label="Default select example" [(ngModel)]="entityItem.I_name" (change)="setItemName()">
+                <option *ngFor="let item of (itemsjson | async)" [value]="item.I_id"> 
+                  {{item.I_name}} 
+                </option> 
+              </select>
+            </div>
+            <p *ngIf="selectedItemUnit">Unit: {{ selectedItemUnit }}</p> <!-- Display selected item unit -->
+          </div>
+          
           <div class="mb-3">  
             <label for="Quantiy" class="form-label">Enter Quantity</label>
             <input type="number" class="form-control" id="Quantiy" [(ngModel)]="selectedItemQty">
@@ -163,24 +193,24 @@
         <div class="modal-body">
           <form>
             <div class="mb-3">
-              <label for="editItemName" class="form-label">Item Id</label>
-              <input type="text" class="form-control" id="editItemName" [(ngModel)]="editItemName"
+              <label for="editItemName" class="form-label">Item Name</label>
+              <input type="text" class="form-control" id="editItemName" [(ngModel)]="entityIRItem.Item_name"
                 name="editItemName" disabled/>
             </div>
             <div class="mb-3">
               <label for="editItemUnit" class="form-label">Item Unit</label>
-              <input type="text" class="form-control" id="editItemUnit" [(ngModel)]="editItemUnit"
+              <input type="text" class="form-control" id="editItemUnit" [(ngModel)]="entityIRItem.Item_Unit"
                 name="editItemUnit" disabled/>
             </div>
             <div class="mb-3">
               <label for="editItemQty" class="form-label">Item Quantity</label>
-              <input type="text" class="form-control" id="editItemQty" [(ngModel)]="editItemQty"
+              <input type="text" class="form-control" id="editItemQty" [(ngModel)]="entityIRItem.Item_Qty"
                 name="editItemQty" />
             </div>
             <br/>
             <div class="mb-3">
               <label for="editItemRate" class="form-label">Item Rate</label>
-              <input type="text" class="form-control" id="editItemRate" [(ngModel)]="editItemRate"
+              <input type="text" class="form-control" id="editItemRate" [(ngModel)]="entityIRItem.Item_Rate"
                 name="editItemRate" />
             </div>
           </form>
