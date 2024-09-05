@@ -21,6 +21,8 @@ export class HomeComponent implements OnInit {
   dataSource = new MatTableDataSource<IRitem>();
 
   selectedItemId!:number;
+  isEditMode: boolean = false;  // To toggle between Add and Edit mode
+
   entityIResult: Iresult = <Iresult>{};
   entityIRItem: IRitem = <IRitem>{};
   entityItem: IItem = <IItem>{};
@@ -64,6 +66,54 @@ export class HomeComponent implements OnInit {
 
   loadItems(): Observable<IItem[]> {
     return of(ItemJson);
+  }
+
+  openAddEditModal(isEdit: boolean, item?: IRitem) {
+    this.isEditMode = isEdit;
+
+    if (isEdit && item) {
+      // Populate the fields with existing item details for editing
+      this.selectedItemId = item.Item_Id;
+
+      this.selectedItemQty = item.Item_Qty;
+      this.selectedItemRate = item.Item_Rate;
+    } else {
+      // Reset fields for adding new item
+
+      this.selectedItemDetails = undefined;
+      this.selectedItemQty = 0;
+      this.selectedItemRate = 0;
+    }
+  }
+
+  saveItem(): void {
+    if (this.isEditMode && this.selectedItemId !== null) {
+      // Edit mode: update the existing item
+      const index = this.items.findIndex(i => i.Item_Id === this.selectedItemId);
+      if (index !== -1) {
+        this.items[index].Item_Qty = this.selectedItemQty;
+        this.items[index].Item_Rate = this.selectedItemRate;
+        this.items[index].Item_Value = this.calculateItemValue(this.selectedItemQty, this.selectedItemRate);
+      }
+    } else {
+      // Add mode: add new item
+      if (this.selectedItemDetails) {
+        const newItem: IRitem = {
+          Sr_No: this.items.length + 1,
+          Item_Id: this.selectedItemDetails.I_id,
+          Item_name: this.selectedItemDetails.I_name,
+          Item_Unit: this.selectedItemDetails.I_QtyUnit,
+          Item_Qty: this.selectedItemQty,
+          Item_Rate: this.selectedItemRate,
+          Item_Value: this.calculateItemValue(this.selectedItemQty, this.selectedItemRate),
+        };
+        this.items.push(newItem);
+      }
+    }
+
+    // Reset form and update table data
+    this.clearItemSelection();
+    this.updateTableData();
   }
 
   displayFn(customer: Icustomer | null): string {
@@ -159,6 +209,7 @@ export class HomeComponent implements OnInit {
     this.selectedItemDetails = undefined;
     this.selectedItemQty = 0;
     this.selectedItemRate = 0;
+    this.selectedItemId!;
   }
 
 
