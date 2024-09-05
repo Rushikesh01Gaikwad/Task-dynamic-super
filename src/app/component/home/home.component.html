@@ -54,13 +54,15 @@
     </form>
     <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarSupportedContent">
       <form class="d-flex">
-        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#AddEditModal" (click)="openAddEditModal(false)">
+        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#AddEditModal" (click)="openAddEditModal()">
           Add Item
         </button>
       </form>
     </div>
     <div>
-      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource"  class="mat-elevation-z8">
+      
+    
         <!-- Columns for the table -->
         <ng-container matColumnDef="I_id">
           <th mat-header-cell *matHeaderCellDef>Sr.No</th>
@@ -69,7 +71,7 @@
 
         <ng-container matColumnDef="I_name">
           <th mat-header-cell *matHeaderCellDef>Item</th>
-          <td mat-cell *matCellDef="let element">{{ element.Item_name }}</td>
+          <td mat-cell *matCellDef="let element">{{ element.Item.I_name}}</td>
         </ng-container>
 
         <ng-container matColumnDef="I_QtyUnit">
@@ -102,18 +104,18 @@
           <th mat-header-cell *matHeaderCellDef>Action</th>
           <td mat-cell *matCellDef="let element">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddEditModal"
-            (click)="openAddEditModal(true, element)">
+           >
               Edit
             </button>
             <button class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#deleteModal"
-              (click)="selectedItem(element.Item_Id)">
+              (click)="onItemSelected(element.Item_Id)">
               Delete
             </button>
           </td>
         </ng-container>
-
+      
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;  let i = index;" (click)="openAddEditModal(i,row)"></tr>
       </table>
 
       <div class="d-flex justify-content-between mt-3">
@@ -135,36 +137,34 @@
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="exampleModalLabel">
-            {{ isEditMode ? "Edit Item" : "Add Item" }}
+            {{ editIndex>=1 ? "Edit Item" : "Add Item" }}
           </h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="mb-3" *ngIf="!isEditMode">
+          <div class="mb-3">
             <div class="dropdown">
               <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown"
                 aria-expanded="false">
                 Select Item
               </button>
               <ul class="dropdown-menu">
-                <li *ngFor="let item of itemsjson | async" (click)="onItemSelected(item)">
+                <li *ngFor="let item of itemsjson" (click)="onItemSelected(item)">
                   {{ item.I_name }}
                 </li>
               </ul>
             </div>
           </div>
           <div class="mb-3">
-            <strong>Selected Name: {{ selectedItemDetails?.I_name }}</strong><br />
-            <strong>Unit is: {{ selectedItemDetails?.I_QtyUnit }}</strong>
+            <strong>Selected Name: {{ reference.Item.I_name }}</strong><br />
+            <strong>Unit is: {{ reference.Item.I_QtyUnit }}</strong>
           </div>
-          <div class="mb-3"></div>
-
           <div class="mb-3">
             <label for="Quantiy" class="form-label">Enter Quantity</label>
-            <input type="number" class="form-control" id="Quantiy" [(ngModel)]="selectedItemQty" />
+            <input type="number" class="form-control" id="Quantiy" [(ngModel)]="reference.Item_Qty" />
             <br />
             <label for="Rate" class="form-label">Enter Rate</label>
-            <input type="number" class="form-control" id="Rate" [(ngModel)]="selectedItemRate" />
+            <input type="number" class="form-control" id="Rate" [(ngModel)]="reference.Item_Rate" />
           </div>
         </div>
         <div class="mb-3"></div>
@@ -173,104 +173,9 @@
             Close
           </button>
           <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="saveItem()">
-            {{isEditMode ? 'Update' : 'Add'}}
+            {{editIndex>=-1 ? 'Update' : 'Add'}}
           </button>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal for adding new item -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Add Item</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <div class="dropdown">
-            <button class="btn btn-light dropdown-toggle w-100" type="button" data-bs-toggle="dropdown"
-              aria-expanded="false">
-              Select Item
-            </button>
-            <ul class="dropdown-menu">
-              <li *ngFor="let item of itemsjson | async" (click)="onItemSelected(item)">
-                {{ item.I_name }}
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="mb-3">
-          <strong>Selected Name: {{ selectedItemDetails?.I_name }}</strong><br />
-          <strong>Unit is: {{ selectedItemDetails?.I_QtyUnit }}</strong>
-        </div>
-        <div class="mb-3"></div>
-
-        <div class="mb-3">
-          <label for="Quantiy" class="form-label">Enter Quantity</label>
-          <input type="number" class="form-control" id="Quantiy" [(ngModel)]="selectedItemQty" />
-          <br />
-          <label for="Rate" class="form-label">Enter Rate</label>
-          <input type="number" class="form-control" id="Rate" [(ngModel)]="selectedItemRate" />
-        </div>
-      </div>
-      <div class="mb-3"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="addItem()">
-          Add Item
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal for edit item -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-  aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">Edit Item</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="mb-3">
-            <label for="editItemName" class="form-label">Item Name</label>
-            <input type="text" class="form-control" id="editItemName" [(ngModel)]="entityIRItem.Item_name"
-              name="editItemName" disabled />
-          </div>
-          <div class="mb-3">
-            <label for="editItemUnit" class="form-label">Item Unit</label>
-            <input type="text" class="form-control" id="editItemUnit" [(ngModel)]="entityIRItem.Item_Unit"
-              name="editItemUnit" disabled />
-          </div>
-          <div class="mb-3">
-            <label for="editItemQty" class="form-label">Item Quantity</label>
-            <input type="text" class="form-control" id="editItemQty" [(ngModel)]="entityIRItem.Item_Qty"
-              name="editItemQty" />
-          </div>
-          <br />
-          <div class="mb-3">
-            <label for="editItemRate" class="form-label">Item Rate</label>
-            <input type="text" class="form-control" id="editItemRate" [(ngModel)]="entityIRItem.Item_Rate"
-              name="editItemRate" />
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
-        <button type="button" class="btn btn-primary" (click)="updateItem()" data-bs-dismiss="modal">
-          Update
-        </button>
       </div>
     </div>
   </div>
@@ -291,9 +196,10 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Close
         </button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="deleteItem()">
-          Delete
-        </button>
+        <button class="btn btn-primary mx-3" data-bs-toggle="modal" data-bs-target="#deleteModal"
+        (click)="deleteItem()">
+        Delete
+      </button>
       </div>
     </div>
   </div>

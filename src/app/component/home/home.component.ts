@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import {Observable, of} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 import { Icustomer } from '../../interfaces/icustomer';
 import { IRitem, Iresult } from '../../interfaces/iresult';
 import { MatTableDataSource } from '@angular/material/table';
 import { ResultServiceService } from '../../services/result-service.service';
 import ItemJson from '../../jsonData/item.json';
 import { IItem } from '../../interfaces/i-item';
-import customerData from '../../jsonData/customer.json';
+import customerJson from '../../jsonData/customer.json';
 
 @Component({
   selector: 'app-home',
@@ -17,42 +17,34 @@ import customerData from '../../jsonData/customer.json';
 })
 export class HomeComponent implements OnInit {
 
-  displayedColumns: string[] = ['I_id', 'I_name', 'I_QtyUnit', 'Item_Qty','Item_Rate','Item_Value','Action'];
+  displayedColumns: string[] = ['I_id', 'I_name', 'I_QtyUnit', 'Item_Qty', 'Item_Rate', 'Item_Value', 'Action'];
   dataSource = new MatTableDataSource<IRitem>();
 
-  selectedItemId!:number;
-  isEditMode: boolean = false;  // To toggle between Add and Edit mode
+  editIndex: number = -1;  // To toggle between Add and Edit mode
 
   entityIResult: Iresult = <Iresult>{};
-  entityIRItem: IRitem = <IRitem>{};
-  entityItem: IItem = <IItem>{};
+  reference: IRitem = <IRitem>{};
+
   entityICustomer: Icustomer = <Icustomer>{}
 
-  reference:any;
-  jsonItems = <IItem[]>ItemJson
-  selectedItemUnit: string | undefined;
 
-  selectedItemQty: number = 0;
-  selectedItemRate: number = 0;
+  jsonItems = <IItem[]>ItemJson
+  customers = <Icustomer[]>customerJson;
 
   customerControl = new FormControl<string | Icustomer>('');
+  itemControl = new FormControl<IItem | string>('');
   filteredOptions!: Observable<Icustomer[]>;
-  itemsjson!: Observable<IItem[]>;
 
-  customers: Icustomer[] = customerData;
+  itemsjson!: IItem[];
+
   selectedCustomerDetails: any = null;
 
-  itemControl = new FormControl<IItem | string>('');
-  selectedItemDetails: IItem | undefined;
-
-  // New array to store the items
-  items: IRitem[] = [];
-
-  constructor(private resultService :ResultServiceService) {}
+  constructor(private resultService: ResultServiceService) { }
 
   ngOnInit(): void {
-
+    this.itemsjson = <IItem[]>[];
     this.entityIResult.Items = <IRitem[]>[];
+    this.reference.Item = <IItem>{};
     this.filteredOptions = this.customerControl.valueChanges.pipe(
       startWith(''),
       map(value => {
@@ -61,57 +53,43 @@ export class HomeComponent implements OnInit {
       })
     );
     this.updateTableData();
-    this.itemsjson = this.loadItems(); // Load items here
+    this.itemsjson = ItemJson; // Load items here
   }
 
-  loadItems(): Observable<IItem[]> {
-    return of(ItemJson);
-  }
-
-  openAddEditModal(isEdit: boolean, item?: IRitem) {
-    this.isEditMode = isEdit;
-
-    if (isEdit && item) {
-      // Populate the fields with existing item details for editing
-      this.selectedItemId = item.Item_Id;
-
-      this.selectedItemQty = item.Item_Qty;
-      this.selectedItemRate = item.Item_Rate;
-    } else {
-      // Reset fields for adding new item
-
-      this.selectedItemDetails = undefined;
-      this.selectedItemQty = 0;
-      this.selectedItemRate = 0;
+  openAddEditModal(idx?: number, item?: IRitem) {
+    this.editIndex = idx || -1;
+    if (this.editIndex >= -1) {
+      this.reference = <IRitem>{};
+      this.reference.Item = <IItem>{};
     }
+    else
+      this.reference = Object.assign({}, item);
+
+    //  this.entityItem = this.itemsjson.filter(f => f.I_id ==  this.reference.I_id)[0];
+
   }
 
   saveItem(): void {
-    if (this.isEditMode && this.selectedItemId !== null) {
+
+    this.reference.Item_Unit = this.reference.Item.I_QtyUnit;
+
+    if (this.editIndex >= 0) {
       // Edit mode: update the existing item
-      const index = this.items.findIndex(i => i.Item_Id === this.selectedItemId);
+      let items = this.entityIResult.Items;
+
+      const index = items!.findIndex(i => i.Item_Id === this.reference.Item_Id);
       if (index !== -1) {
-        this.items[index].Item_Qty = this.selectedItemQty;
-        this.items[index].Item_Rate = this.selectedItemRate;
-        this.items[index].Item_Value = this.calculateItemValue(this.selectedItemQty, this.selectedItemRate);
+        items![index] = {
+          ...this.reference,
+          Item_Value: this.calculateItemValue(this.reference),
+        };
       }
     } else {
-      // Add mode: add new item
-      if (this.selectedItemDetails) {
-        const newItem: IRitem = {
-          Sr_No: this.items.length + 1,
-          Item_Id: this.selectedItemDetails.I_id,
-          Item_name: this.selectedItemDetails.I_name,
-          Item_Unit: this.selectedItemDetails.I_QtyUnit,
-          Item_Qty: this.selectedItemQty,
-          Item_Rate: this.selectedItemRate,
-          Item_Value: this.calculateItemValue(this.selectedItemQty, this.selectedItemRate),
-        };
-        this.items.push(newItem);
-      }
+      // Add mode: add a new item
+
+      this.entityIResult.Items!.push(this.reference);
     }
 
-    // Reset form and update table data
     this.clearItemSelection();
     this.updateTableData();
   }
@@ -128,15 +106,10 @@ export class HomeComponent implements OnInit {
   }
 
   onItemSelected(item: IItem): void {
-
-    this.selectedItemDetails = item;
+    this.reference.Item_Id = item.I_id;
+    this.reference.Item = item;
     this.itemControl.setValue(item);
     console.log('Selected Item:', item);
-  }
-
-  setItemName():void
-  {
-
   }
 
   validateInput(event: Event) {
@@ -145,17 +118,17 @@ export class HomeComponent implements OnInit {
     this.entityIResult.order_no = input.value
   }
 
-  updateItemValue(element: IRitem): void {
-    element.Item_Value = this.calculateItemValue(element.Item_Qty, element.Item_Rate);
+  updateItemValue(Obj: IRitem): void {
+    Obj.Item_Value = parseFloat((Obj.Item_Qty * Obj.Item_Rate).toFixed(2));
     this.updateFinalAmount();
   }
 
-  private calculateItemValue(quantity: number, rate: number): number {
-    return parseFloat((quantity * rate).toFixed(2));
+  private calculateItemValue(Obj: IRitem): number {
+    return parseFloat((Obj.Item_Qty * Obj.Item_Rate).toFixed(2));
   }
 
   private updateFinalAmount(): void {
-    this.entityIResult.Amount = this.items.reduce((sum, current) => sum + current.Item_Value, 0);
+    this.entityIResult.Amount = this.entityIResult.Items!.reduce((sum, current) => sum + current.Item_Value, 0);
     this.entityIResult.Amount = parseFloat(this.entityIResult.Amount.toFixed(2));
   }
 
@@ -164,7 +137,7 @@ export class HomeComponent implements OnInit {
     this.entityIResult.cust_id = this.selectedCustomerDetails.acc_code;
     console.log('Selected Customer Details:', this.selectedCustomerDetails);
   }
-  
+
 
   formatDate(event: any): void {
     const inputDate = event.target.value; // This will be in yyyy-MM-dd format
@@ -176,7 +149,7 @@ export class HomeComponent implements OnInit {
     if (!dateString) return '';
     const [day, month, year] = dateString.split('/').map(Number);
     const formattedDate = new Date(year, month, day);
-    return formattedDate.toISOString().split('T')[0]; // yyyy-MM-dd
+    return formattedDate.toISOString().split('T')[0];
   }
 
   private formatToDDMMYYYY(date: Date): string {
@@ -186,95 +159,41 @@ export class HomeComponent implements OnInit {
     return `${day}/${month}/${year}`;
   }
 
-  addItem(): void {
-    if (this.selectedItemDetails) {
-      const newItem: IRitem = {
-        Sr_No: this.items.length + 1,
-        Item_Id: this.selectedItemDetails.I_id,
-        Item_name: this.selectedItemDetails.I_name,
-        Item_Unit: this.selectedItemDetails.I_QtyUnit,
-        Item_Qty: this.selectedItemQty,
-        Item_Rate: this.selectedItemRate,
-        Item_Value: this.calculateItemValue(this.selectedItemQty, this.selectedItemRate),
-      };
-
-      this.items.push(newItem);
-      this.clearItemSelection();
-      this.updateTableData();
-      console.log(newItem);
-    }
-  }
-
   clearItemSelection(): void {
-    this.selectedItemDetails = undefined;
-    this.selectedItemQty = 0;
-    this.selectedItemRate = 0;
-    this.selectedItemId!;
+    this.reference = <IRitem>{};
+    this.itemControl.reset();
+
   }
-
-
   submitData(): void {
 
-    const itemsWithoutItemName = this.items.map(({ Item_name,Sr_No, ...item }) => item);
-  
-    const result: Iresult = {
-      order_no: this.entityIResult.order_no,
-      Order_date: this.entityIResult.Order_date,
-      cust_id: this.entityIResult.cust_id,
-      Amount: this.entityIResult.Amount,
-      Items: itemsWithoutItemName
-    };
-  
-    // Convert the result to JSON format
-    // const resultJson = JSON.stringify(result, null, 2);
-    // console.log(resultJson);
 
-    this.resultService.postResult(result).subscribe((responce)=>{
+    // const itemsWithoutItemName = this.items.map(({ Item_name, Sr_No, ...item }) => item);
+    // this.entityIResult.Items=itemsWithoutItemName;
+
+    // const result: Iresult = {
+    //   order_no: this.entityIResult.order_no,
+    //   Order_date: this.entityIResult.Order_date,
+    //   cust_id: this.entityIResult.cust_id,
+    //   Amount: this.entityIResult.Amount,
+    //   Items: itemsWithoutItemName
+    // };
+    this.entityIResult.Items=undefined;
+    this.resultService.postResult(this.entityIResult).subscribe((responce) => {
       console.log("Data posted successfully...")
       window.location.reload();
     })
   }
-  
 
-  // Update the dataSource with the new items array
   private updateTableData(): void {
-    this.dataSource.data = this.items;
+    this.dataSource.data = this.entityIResult.Items || [];
     this.updateFinalAmount();
-
   }
 
-  selectedItem(itemId: any){
-
-    this.selectedItemId = itemId;
-    const item = this.items.find(i => i.Item_Id === itemId);
-  
-  if (item) {
-    this.entityIRItem.Item_name = item.Item_name || '';
-    this.entityIRItem.Item_Unit = item.Item_Unit;
-    this.entityIRItem.Item_Qty = item.Item_Qty;
-    this.entityIRItem.Item_Rate = item.Item_Rate;
-  }
-  }
-  updateItem() {
-    const index = this.items.findIndex(i => i.Item_Id === this.selectedItemId);
-
-    if (index !== -1) {
-      this.items[index].Item_Unit = this.entityIRItem.Item_Unit;
-      this.items[index].Item_Qty = this.entityIRItem.Item_Qty
-      this.items[index].Item_Rate = this.entityIRItem.Item_Rate;
-      this.items[index].Item_Value = this.entityIRItem.Item_Qty * this.entityIRItem.Item_Rate;
-      
-      this.updateFinalAmount();
-      this.updateTableData();
-      console.log(this.items)
-    }
-  }
-
-  deleteItem(){
-    this.items = this.items.filter(item => item.Item_Id !== this.selectedItemId);
+  deleteItem() {
+    this.entityIResult.Items = this.entityIResult.Items?.filter(item => item.Item_Id !== this.reference.Item_Id);
     this.updateTableData();
-    console.log(this.items)
-
   }
-  
+
+
+
 }
