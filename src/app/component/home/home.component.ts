@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ChangeDetectorRef  } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
@@ -35,11 +35,11 @@ export class HomeComponent implements OnInit {
   itemControl = new FormControl<IItem | string>('');
   filteredOptions!: Observable<Icustomer[]>;
 
-  itemsjson!: IItem[];
+  itemsjson = <IItem[]>ItemJson; // Initialize with item JSON data
 
   selectedCustomerDetails: any = null;
 
-  constructor(private resultService: ResultServiceService) { }
+  constructor(private resultService: ResultServiceService, private cd: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.itemsjson = <IItem[]>[];
@@ -57,15 +57,25 @@ export class HomeComponent implements OnInit {
   }
 
   openAddEditModal(idx?: number, item?: IRitem) {
-    this.editIndex = idx || -1;
-    if (this.editIndex >= -1) {
+    this.editIndex = idx !== undefined ? idx: -1;
+    if (this.editIndex >= 0 && item) {
+      this.reference = Object.assign({}, item);
+      console.log(this.reference)
+          if (this.reference.Item) {
+      // If the item exists, log it to confirm
+      console.log('Editing item with name:', this.reference.Item.I_name);
+      console.log('Editing item with unit:', this.reference.Item.I_QtyUnit);
+    }
+    }
+    else
+    { 
       this.reference = <IRitem>{};
       this.reference.Item = <IItem>{};
     }
-    else
-      this.reference = Object.assign({}, item);
 
     //  this.entityItem = this.itemsjson.filter(f => f.I_id ==  this.reference.I_id)[0];
+     // Trigger change detection to update the view
+     this.cd.detectChanges();
 
   }
 
@@ -86,7 +96,7 @@ export class HomeComponent implements OnInit {
       }
     } else {
       // Add mode: add a new item
-
+      this.reference.Item_Value = this.calculateItemValue(this.reference);
       this.entityIResult.Items!.push(this.reference);
     }
 
@@ -108,7 +118,7 @@ export class HomeComponent implements OnInit {
   onItemSelected(item: IItem): void {
     this.reference.Item_Id = item.I_id;
     this.reference.Item = item;
-    this.itemControl.setValue(item);
+    //this.itemControl.setValue(item);
     console.log('Selected Item:', item);
   }
 
@@ -161,9 +171,10 @@ export class HomeComponent implements OnInit {
 
   clearItemSelection(): void {
     this.reference = <IRitem>{};
-    this.itemControl.reset();
-
+    this.editIndex = -1;
   }
+
+  
   submitData(): void {
 
 
@@ -191,9 +202,7 @@ export class HomeComponent implements OnInit {
 
   deleteItem() {
     this.entityIResult.Items = this.entityIResult.Items?.filter(item => item.Item_Id !== this.reference.Item_Id);
+    this.reference = <IRitem>{};
     this.updateTableData();
   }
-
-
-
 }

@@ -176,21 +176,6 @@
           "Item_Value": 2000
         }
       ]
-    },
-    {
-      "id": "b0a2",
-      "order_no": "1212121",
-      "Order_date": "05/09/2024",
-      "cust_id": 1422,
-      "Amount": null,
-      "Items": [
-        {
-          "Item_Id": 2,
-          "Item_Unit": "BAG",
-          "Item_Qty": 123123,
-          "Item_Value": null
-        }
-      ]
     }
   ]
 }
