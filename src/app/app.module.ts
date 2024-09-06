@@ -19,6 +19,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButtonModule} from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { DatePipe } from '@angular/common';
 
 
 @NgModule({
@@ -47,6 +48,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatDialogModule
   ],
   providers: [
+    DatePipe,
     provideAnimationsAsync()
   ],
   bootstrap: [AppComponent]

@@ -9,8 +9,10 @@
       </div>
       <div class="mb-3">
         <label for="orderDate" class="form-label">Date</label>
-        <input type="date" name="orderDate" class="form-control" min="2024-04-01" max="2025-03-31"
-          [value]="formatToYYYYMMDD(entityIResult.Order_date)" (change)="formatDate($event)" />
+        <input type="date" name="orderDate" class="form-control" [(ngModel)]="entityIResult.Order_date" 
+        (change)="handleDateChange($event)"
+        >
+        <small *ngIf="dateInvalid" style="color: red;">Enter the date between 01 april 2024 to 31 march 2025</small>
       </div>
       <div class="mb-3">
         <mat-form-field class="example-full-width">
@@ -150,7 +152,7 @@
                 Select Item
               </button>
               <ul class="dropdown-menu">
-                <li *ngFor="let item of itemsjson" (click)="onItemSelected(item)">
+                <li *ngFor="let item of jsonItems" (click)="onItemSelected(item)">
                   {{ item.I_name }}
                 </li>
               </ul>

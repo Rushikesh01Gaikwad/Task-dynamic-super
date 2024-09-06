@@ -6,7 +6,7 @@ export interface Iresult {
     Order_date: string;
     cust_id: number;
     Amount: number;
-    Items?: IRitem[];
+    Items: IRitem[];
 }
 
 export interface IRitem {
@@ -16,5 +16,5 @@ export interface IRitem {
     Item_Qty: number
     Item_Rate: number
     Item_Value: number
-    Item:IItem
+    Item?:IItem
 }
