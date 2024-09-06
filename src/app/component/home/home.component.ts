@@ -60,12 +60,6 @@ export class HomeComponent implements OnInit {
     this.editIndex = idx !== undefined ? idx: -1;
     if (this.editIndex >= 0 && item) {
       this.reference = Object.assign({}, item);
-      console.log(this.reference)
-          if (this.reference.Item) {
-      // If the item exists, log it to confirm
-      console.log('Editing item with name:', this.reference.Item.I_name);
-      console.log('Editing item with unit:', this.reference.Item.I_QtyUnit);
-    }
     }
     else
     { 
@@ -80,8 +74,6 @@ export class HomeComponent implements OnInit {
   }
 
   saveItem(): void {
-
-    this.reference.Item_Unit = this.reference.Item.I_QtyUnit;
 
     if (this.editIndex >= 0) {
       // Edit mode: update the existing item
@@ -98,6 +90,7 @@ export class HomeComponent implements OnInit {
       // Add mode: add a new item
       this.reference.Item_Value = this.calculateItemValue(this.reference);
       this.entityIResult.Items!.push(this.reference);
+      console.log(this.entityIResult.Items)
     }
 
     this.clearItemSelection();
@@ -119,7 +112,6 @@ export class HomeComponent implements OnInit {
     this.reference.Item_Id = item.I_id;
     this.reference.Item = item;
     //this.itemControl.setValue(item);
-    console.log('Selected Item:', item);
   }
 
   validateInput(event: Event) {
@@ -145,14 +137,12 @@ export class HomeComponent implements OnInit {
   onOptionSelected(event: any): void {
     this.selectedCustomerDetails = event.option.value;
     this.entityIResult.cust_id = this.selectedCustomerDetails.acc_code;
-    console.log('Selected Customer Details:', this.selectedCustomerDetails);
   }
 
 
   formatDate(event: any): void {
     const inputDate = event.target.value; // This will be in yyyy-MM-dd format
     this.entityIResult.Order_date = this.formatToDDMMYYYY(new Date(inputDate));
-    console.log('Selected Date: ', this.entityIResult.Order_date);
   }
 
   formatToYYYYMMDD(dateString: string): string {

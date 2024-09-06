@@ -155,27 +155,11 @@
       ]
     },
     {
-      "id": "515b",
-      "order_no": "SHHHH24",
-      "Order_date": "30/09/2024",
-      "cust_id": 59,
-      "Amount": 4000,
-      "Items": [
-        {
-          "Item_Id": 2,
-          "Item_Unit": "BAG",
-          "Item_Qty": 50,
-          "Item_Rate": 40,
-          "Item_Value": 2000
-        },
-        {
-          "Item_Id": 3,
-          "Item_Unit": "NOS",
-          "Item_Qty": 50,
-          "Item_Rate": 40,
-          "Item_Value": 2000
-        }
-      ]
+      "id": "2648",
+      "Amount": 605,
+      "order_no": "DDSS123",
+      "Order_date": "11/09/2024",
+      "cust_id": 18777
     }
   ]
 }
