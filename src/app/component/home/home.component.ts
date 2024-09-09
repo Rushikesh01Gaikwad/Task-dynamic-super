@@ -10,6 +10,7 @@ import ItemJson from '../../jsonData/item.json';
 import { IItem } from '../../interfaces/i-item';
 import customerJson from '../../jsonData/customer.json';
 import { DateServiceService } from '../../services/date-service.service';
+import { RoundValueService } from '../../services/round-value.service';
 
 @Component({
   selector: 'app-home',
@@ -36,7 +37,7 @@ export class HomeComponent implements OnInit {
   itemControl = new FormControl<IItem | string>('');
   filteredOptions!: Observable<Icustomer[]>;
 
-  constructor(private resultService: ResultServiceService, private cd: ChangeDetectorRef, private dateService: DateServiceService) { }
+  constructor(private resultService: ResultServiceService, private cd: ChangeDetectorRef, private dateService: DateServiceService, private round: RoundValueService) { }
 
   ngOnInit(): void {
     this.jsonItems = <IItem[]>[];
@@ -109,18 +110,16 @@ export class HomeComponent implements OnInit {
     this.entityIResult.order_no = input.value
   }
 
-  updateItemValue(Obj: IRitem): void {
-    Obj.Item_Value = +((Obj.Item_Qty * Obj.Item_Rate).toFixed(2));
-    this.updateFinalAmount();
-  }
-
   private calculateItemValue(Obj: IRitem): number {
-    return parseFloat((Obj.Item_Qty * Obj.Item_Rate).toFixed(2));
+    // return +((Obj.Item_Qty * Obj.Item_Rate).toFixed(2));
+    return this.round.roundValue2(+(Obj.Item_Qty * Obj.Item_Rate))
+
   }
 
   private updateFinalAmount(): void {
     this.entityIResult.Amount = this.entityIResult.Items!.reduce((sum, current) => sum + current.Item_Value, 0);
-    this.entityIResult.Amount = +(this.entityIResult.Amount.toFixed(2));
+    // this.entityIResult.Amount = +(this.entityIResult.Amount.toFixed(2));
+    this.entityIResult.Amount = this.round.roundValue2(+(this.entityIResult.Amount))
   }
 
   onOptionSelected(event: any): void {

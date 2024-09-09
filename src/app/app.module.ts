@@ -20,6 +20,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButtonModule} from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
+import { DirRoundDirective } from './directives/dir-round.directive';
 
 
 @NgModule({
@@ -27,6 +28,7 @@ import { DatePipe } from '@angular/common';
     AppComponent,
     HomeComponent,
     NavbarComponent,
+    DirRoundDirective,
   ],
   imports: [
     BrowserModule,
